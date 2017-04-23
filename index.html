@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Avenue Code - Hackathon</title>
+    </head>
+
+    <body>
+        <h3>Avenue Code - Challenge for subscription in Hackathon...</h3>
+    </body>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+</html>
+
+<script>
+    var challenge = '';
+    var challengeLength = 0;
+    var counter = 0;
+    var validCharacters = ['A', 'B', 'C', 'D']
+    var corretChallengeStatus = 0;
+
+    String.prototype.replaceAt = function(index, replacement) {
+        return this.substr(0, index) + replacement + this.substr(index + replacement.length);
+    }
+
+    var discoverChallenge = function(){
+        $.ajax({
+            method: "GET",
+            url: "http://localhost:3000/?coder=frederico@gmail.com&test=true&challenge="+challenge,
+            async: false,
+            success: function(response, data, xhr){
+                correctChallengeStatus = xhr.status;
+                
+                if (correctChallengeStatus != 200){
+                    debugger
+                    var index = [];
+                    for (var i = 0; i < response.result.length; i++) {
+                        if (response.result[i] != 'R')
+                            index.push(i);
+                    }
+
+                    for (var i = 0; i < index.length; i++) {
+                        challenge = challenge.replaceAt(index[i], 'B')
+                    }
+
+                    //trocar todos os indices que nao tem R pela proxima letra válida e fazer outro request
+                    discoverChallenge();
+                }
+            }
+        })
+    }
+    
+    //First ajax with challenge arg empty returns the length of string
+    $.ajax({
+        method: "GET",
+        url: "http://localhost:3000/?coder=frederico.duarte.vieira@gmail.com&test=true&challenge=",
+        success: function(response){
+            challengeLength = response.length;
+            
+            if (challengeLength != 0)
+                challenge = 'A'.repeat(challengeLength);
+                discoverChallenge();
+        }
+    });
+</script>
